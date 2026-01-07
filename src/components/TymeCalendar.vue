@@ -1,12 +1,7 @@
 <template>
   <div class="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow p-[clamp(10px,2.2vw,16px)] relative select-none min-h-[500px] flex flex-col">
     
-    <div class="absolute inset-0 flex items-center justify-center z-0 pointer-events-none overflow-hidden">
-      <div class="font-bold text-gray-100 select-none flex items-center justify-center whitespace-nowrap"
-           style="font-size: clamp(40px, 12vw, 160px);">
-        {{ currentSolarMonth.getYear() }}年{{ String(currentSolarMonth.getMonth()).padStart(2, '0') }}月
-      </div>
-    </div>
+    
 
     <div class="flex items-center justify-between mb-[clamp(8px,1.8vw,12px)] relative z-10">
       <button class="rounded-lg hover:bg-gray-100 text-gray-600 px-[clamp(8px,2vw,12px)] py-[clamp(4px,1vw,8px)] text-[clamp(11px,2.8vw,14px)] transition-colors" @click="prevMonth">上月</button>
@@ -101,6 +96,13 @@
       </div>
     </transition>
 
+    <div class="relative">
+      <div class="font-bold text-gray-100 select-none absolute -translate-x-2/4 -translate-y-2/4 left-2/4 top-2/4 whitespace-nowrap"
+           style="font-size: clamp(40px, 12vw, 160px);">
+        {{ currentSolarMonth.getYear() }}年{{ String(currentSolarMonth.getMonth()).padStart(2, '0') }}月
+      </div>
+    
+
     <div class="grid grid-cols-7 gap-[clamp(2px,0.8vw,6px)] mb-[clamp(6px,1.4vw,10px)] text-center text-gray-500 text-[clamp(10px,2.6vw,13px)] relative z-10">
       <div v-for="w in weeks" :key="w.name" :class="{ 'text-red-500': w.isWeekend }">
         {{ w.name }}
@@ -151,6 +153,7 @@
           </span>
         </div>
       </div>
+    </div>
     </div>
 
     <div class="mt-[clamp(10px,2vw,16px)] rounded-xl bg-gray-50 p-[clamp(10px,2vw,14px)] relative z-10 border border-gray-100">
