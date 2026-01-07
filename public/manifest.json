@@ -14,10 +14,10 @@
     //"default_popup": "page.html"//指定弹出页面【屏蔽这里可以点击图标通过后台脚本直接打开侧边栏】
   },
   "content_scripts": [
-    {
-      "js": [ "content-script.js" ], //指定内容脚本
-      "matches": [ "https://www.google.com/*" ] //匹配的URL
-    }
+    // {
+    //   "js": [ "content-script.js" ], //指定内容脚本
+    //   "matches": [ "https://www.google.com/*" ] //匹配的URL
+    // }
   ],
   "permissions": [ "sidePanel", "contextMenus" ], //请求侧边栏和上下文菜单权限
   "icons": {

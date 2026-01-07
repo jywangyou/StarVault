@@ -2,10 +2,10 @@
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: 'openSidePanel',
-    title: "打开侧边栏",
+    title: "繁星记",
     contexts: ['all']
   });
-  chrome.tabs.create({ url: 'page.html' });
+  // chrome.tabs.create({ url: 'page.html' });
 });
 
 // 监听右键菜单点击事件
