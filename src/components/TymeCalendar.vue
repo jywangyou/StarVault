@@ -1,8 +1,6 @@
 <template>
   <div class="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow p-[clamp(10px,2.2vw,16px)] relative select-none min-h-[500px] flex flex-col">
     
-    
-
     <div class="flex items-center justify-between mb-[clamp(8px,1.8vw,12px)] relative z-10">
       <button class="rounded-lg hover:bg-gray-100 text-gray-600 px-[clamp(8px,2vw,12px)] py-[clamp(4px,1vw,8px)] text-[clamp(11px,2.8vw,14px)] transition-colors" @click="prevMonth">上月</button>
       
@@ -160,6 +158,10 @@
       <div class="text-gray-800 font-semibold text-[clamp(12px,3.2vw,16px)]">{{ huangli.solar }}</div>
       <div class="mt-1 text-gray-600 text-[clamp(10px,2.6vw,13px)]">{{ huangli.lunar }} {{ huangli.gz }}</div>
 
+      <div class="mt-2 mb-2 text-indigo-600 font-bold text-[clamp(11px,2.8vw,14px)]">
+         {{ huangli.distanceInfo }}
+      </div>
+
       <div class="mt-[clamp(8px,1.8vw,12px)] grid grid-cols-1 sm:grid-cols-2 gap-[clamp(8px,1.6vw,12px)] text-[clamp(10px,2.4vw,12px)]">
         <div>
           <div class="text-gray-500 mb-1">宜</div>
@@ -173,32 +175,22 @@
             <span v-for="x in huangli.ji" :key="x" class="px-2 py-0.5 rounded bg-rose-50 text-rose-700">{{ x }}</span>
           </div>
         </div>
-
-        <div class="space-y-1 text-gray-700">
-          <div>纳音：{{ huangli.sound }}</div>
-          <div>冲：{{ huangli.chong }}　煞：{{ huangli.sha }}</div>
-          <div>建除：{{ huangli.duty }}　十二神：{{ huangli.twelveStar }}</div>
-          <div>二十八宿：{{ huangli.twentyEightStar }}</div>
-        </div>
-        <div class="space-y-1 text-gray-700">
-          <div>吉神：{{ huangli.god.ji.join(' ') || '—' }}</div>
-          <div>凶神：{{ huangli.god.xiong.join(' ') || '—' }}</div>
-          <div>胎神：{{ huangli.fetus }}</div>
-          <div>彭祖：{{ huangli.pz.join(' ') }}</div>
-        </div>
       </div>
-
-      <div class="mt-[clamp(8px,1.8vw,12px)] text-gray-500 text-[clamp(10px,2.4vw,12px)]">时辰吉凶</div>
-      <div class="mt-1 flex flex-wrap gap-1 text-[clamp(10px,2.4vw,12px)]">
-        <span v-for="x in huangli.hours" :key="x" class="px-2 py-0.5 rounded bg-white border border-gray-200 text-gray-700">{{ x }}</span>
+      
       </div>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, shallowRef, computed, onMounted, reactive } from 'vue'
 import { Week, SolarMonth, SolarDay } from 'tyme4ts'
+
+// ---------- 自定义节日配置 ----------
+// 格式: '公历月-公历日': '节日名称'
+const customFestivals = reactive<Record<string, string>>({
+  // '1-1': '元旦', // 示例
+  // '1-15': '纪念日' // 示例：你可以按这个格式随意添加
+})
 
 // ---------- 类型 ----------
 interface WeekHead { name: string; isWeekend: boolean }
@@ -222,16 +214,8 @@ interface HuangliInfo {
   gz: string
   yi: string[]
   ji: string[]
-  sound: string
-  chong: string
-  sha: string
-  twelveStar: string
-  twentyEightStar: string
-  god: { ji: string[]; xiong: string[] }
-  duty: string
-  fetus: string
-  pz: string[]
-  hours: string[]
+  distanceInfo: string // 新增距离信息字段
+  // 删除了不需要的详细字段类型
 }
 
 // ---------- 常量 ----------
@@ -250,7 +234,6 @@ const pickerSelection = reactive({ year: now.getFullYear(), month: now.getMonth(
 const pickerBaseYear = ref(now.getFullYear())
 
 // 标题
-// const monthName = computed(() => currentSolarMonth.value.toString())
 const huangli = computed<HuangliInfo>(() => computeHuangli(selectedSolarDay.value))
 
 // 42 格数据
@@ -412,30 +395,39 @@ function buildDayCell(solarDay: SolarDay): DayCell {
   let text = ''
   let isFestivalOrTerm = false
 
-  const f1 = solarDay.getFestival()
-  const f2 = lunarDay.getFestival()
-  const isTerm = term && term.getSolarDay().equals(solarDay)
+  // 0. 优先判断自定义节日 (占用农历显示位置)
+  const customKey = `${solarDay.getMonth()}-${solarDay.getDay()}`
+  if (customFestivals[customKey]) {
+    text = customFestivals[customKey]
+    isFestivalOrTerm = true
+  }
+  else {
+    // 原有逻辑
+    const f1 = solarDay.getFestival()
+    const f2 = lunarDay.getFestival()
+    const isTerm = term && term.getSolarDay().equals(solarDay)
 
-  if (f1) {
-    text = f1.getName()
-    isFestivalOrTerm = true
+    if (f1) {
+      text = f1.getName()
+      isFestivalOrTerm = true
+    }
+    else if (f2) {
+      text = f2.getName()
+      isFestivalOrTerm = true
+    }
+    else if (isTerm) {
+      text = term.getName()
+      if (term.isJie()) text += ' ' + lunarDay.getMonthSixtyCycle() + '月'
+      isFestivalOrTerm = true
+    }
+    else if (lunarDay.getDay() === 1) {
+      const lm = lunarDay.getLunarMonth()
+      text = lm.getName()
+      if (lm.getMonthWithLeap() === 1) text = lm.getLunarYear().getSixtyCycle().getName() + '年' + text
+    } 
+    
+    if (!text) text = lunarDay.getName()
   }
-  else if (f2) {
-    text = f2.getName()
-    isFestivalOrTerm = true
-  }
-  else if (isTerm) {
-    text = term.getName()
-    if (term.isJie()) text += ' ' + lunarDay.getMonthSixtyCycle() + '月'
-    isFestivalOrTerm = true
-  }
-  else if (lunarDay.getDay() === 1) {
-    const lm = lunarDay.getLunarMonth()
-    text = lm.getName()
-    if (lm.getMonthWithLeap() === 1) text = lm.getLunarYear().getSixtyCycle().getName() + '年' + text
-  } 
-  
-  if (!text) text = lunarDay.getName()
 
   return {
     solarDay,
@@ -456,28 +448,50 @@ function computeHuangli(solarDay: SolarDay): HuangliInfo {
   const lunarMonth: any = lunarDay.getLunarMonth()
   const threePillars: any = lunarDay.getThreePillars()
   const sixtyCycle: any = threePillars.getDay()
-  const heavenStem: any = sixtyCycle.getHeavenStem()
-  const earthBranch: any = sixtyCycle.getEarthBranch()
 
   const yi = lunarDay.getRecommends().map((x: any) => x.toString())
   const ji = lunarDay.getAvoids().map((x: any) => x.toString())
 
-  const twelveStar: any = lunarDay.getTwelveStar()
-  const twelveStarText = `${twelveStar.toString()}(${twelveStar.getEcliptic().getLuck()})`
+  // ----- 距离计算逻辑 -----
+  // 1. 获取目标名称
+  let targetName = lunarDay.getName()
+  // 检查自定义节日
+  const customKey = `${solarDay.getMonth()}-${solarDay.getDay()}`
+  if (customFestivals[customKey]) {
+    targetName = customFestivals[customKey]
+  } else {
+    // 检查标准节日/节气
+    const f1 = solarDay.getFestival()
+    const f2 = lunarDay.getFestival()
+    const term = solarDay.getTerm()
+    const isTerm = term && term.getSolarDay().equals(solarDay)
+    
+    if (f1) targetName = f1.getName()
+    else if (f2) targetName = f2.getName()
+    else if (isTerm) targetName = term.getName()
+  }
 
-  const gods: any[] = lunarDay.getGods()
-  const jiGods: string[] = []
-  const xiongGods: string[] = []
-  gods.forEach((g: any) => {
-    const name = g.toString()
-    if (String(g.getLuck()) === '吉') jiGods.push(name)
-    else xiongGods.push(name)
-  })
+  // 2. 计算天数差
+  // 构造标准Date对象用于比较 (设置为0点)
+  const todayDate = new Date()
+  todayDate.setHours(0,0,0,0)
+  
+  const selectedDate = new Date(solarDay.getYear(), solarDay.getMonth() - 1, solarDay.getDay())
+  selectedDate.setHours(0,0,0,0)
 
-  const twentyEightStar: any = lunarDay.getTwentyEightStar()
+  const diffTime = selectedDate.getTime() - todayDate.getTime()
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) 
 
-  const hours: string[] = lunarDay.getHours().map((h: any) => `${h.getSixtyCycle()}${h.getTwelveStar().getEcliptic().getLuck()}`)
+  let distanceInfo = ''
+  if (diffDays === 0) {
+    distanceInfo = `${targetName}就是今天`
+  } else if (diffDays > 0) {
+    distanceInfo = `距离${targetName}还有${diffDays}天`
+  } else {
+    distanceInfo = `距离${targetName}已过${Math.abs(diffDays)}天`
+  }
 
+  // 已移除其他详细数据的计算，只保留要求的字段
   return {
     solar: `${solarDay.toString()} 星期${solarDay.getWeek().getName()}`,
     week: solarDay.getWeek().toString(),
@@ -485,16 +499,7 @@ function computeHuangli(solarDay: SolarDay): HuangliInfo {
     gz: `${threePillars.getYear()}(${threePillars.getYear().getEarthBranch().getZodiac()})年 ${threePillars.getMonth()}月 ${sixtyCycle}日`,
     yi,
     ji,
-    sound: sixtyCycle.getSound().toString(),
-    chong: earthBranch.getOpposite().getZodiac().toString(),
-    sha: earthBranch.getOminous().toString(),
-    twelveStar: twelveStarText,
-    twentyEightStar: `${twentyEightStar}${twentyEightStar.getSevenStar()}${twentyEightStar.getAnimal()} ${twentyEightStar.getLuck()}`,
-    god: { ji: jiGods, xiong: xiongGods },
-    duty: lunarDay.getDuty().toString(),
-    fetus: lunarDay.getFetusDay().toString(),
-    pz: [heavenStem.getPengZuHeavenStem().toString(), earthBranch.getPengZuEarthBranch().toString()],
-    hours
+    distanceInfo
   }
 }
 
