@@ -1,14 +1,24 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import TymeCalendar from './components/TymeCalendar.vue'
+import Sidebar from './components/Sidebar.vue'
+
+const sidebarPosition = ref<'left' | 'right'>('right')
 </script>
 
 <template>
-  <div class="min-h-screen flex justify-center ">
-    <TymeCalendar />
+  <div 
+    class="h-screen w-screen flex overflow-hidden bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300"
+    :class="[sidebarPosition === 'right' ? 'flex-row-reverse' : 'flex-row']"
+  >
+    <!-- Sidebar -->
+    <Sidebar @update:position="(pos) => sidebarPosition = pos" />
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-auto flex justify-center w-full relative">
+      <TymeCalendar />
+    </main>
   </div>
-  <!-- <div class="fixed inset-0 pointer-events-none flex items-center justify-center">
-    <div class="text-[56px] sm:text-[88px] font-bold text-gray-200/50 select-none">{{ new Date().getFullYear() }}年{{ new Date().getMonth()+1 }}月</div>
-  </div> -->
 </template>
 
 <style scoped>

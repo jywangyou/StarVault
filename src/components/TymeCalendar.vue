@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow p-[clamp(10px,2.2vw,16px)] relative select-none min-h-[500px] flex flex-col">
+  <div class="w-full max-w-4xl mx-auto bg-white  shadow p-[clamp(10px,2.2vw,16px)] relative select-none min-h-[500px] flex flex-col">
     
     <div class="flex items-center justify-between mb-[clamp(8px,1.8vw,12px)] relative z-10">
       <button class="rounded-lg hover:bg-gray-100 text-gray-600 px-[clamp(8px,2vw,12px)] py-[clamp(4px,1vw,8px)] text-[clamp(11px,2.8vw,14px)] transition-colors" @click="prevMonth">上月</button>
@@ -183,6 +183,7 @@
 
 <script setup lang="ts">
 import { ref, shallowRef, computed, onMounted, reactive } from 'vue'
+// Week: 星期, SolarMonth: 公历月, SolarDay: 公历日
 import { Week, SolarMonth, SolarDay } from 'tyme4ts'
 
 // ---------- 自定义节日配置 ----------
@@ -194,55 +195,61 @@ const customFestivals = reactive<Record<string, string>>({
 
 // ---------- 类型 ----------
 interface WeekHead { name: string; isWeekend: boolean }
+// 定义日历中每一格的数据结构
 interface DayCell {
-  solarDay: SolarDay
-  day: number
-  holiday: { isWork: boolean } | null
-  isCurrentMonth: boolean
-  isToday: boolean
-  isWeekend: boolean
-  text: string
-  isFestivalOrTerm: boolean 
-  moon: boolean
-  moonIndex: number
+  solarDay: SolarDay      // tyme4ts 的公历对象
+  day: number             // 数字日期
+  holiday: { isWork: boolean } | null // 节假日状态（放假或补班）
+  isCurrentMonth: boolean // 是否属于当前查看的月份
+  isToday: boolean        // 是否是今天
+  isWeekend: boolean      // 是否是周末
+  text: string            // 显示的文案（农历、节日或节气）
+  isFestivalOrTerm: boolean // 是否是节日或节气（用于高亮颜色）
+  moon: boolean           // 是否显示月相图标
+  moonIndex: number       // 月相类型索引
 }
 
+// 定义下方黄历详情的结构
 interface HuangliInfo {
-  solar: string
-  week: string
-  lunar: string
-  gz: string
-  yi: string[]
-  ji: string[]
-  distanceInfo: string // 新增距离信息字段
-  // 删除了不需要的详细字段类型
+  solar: string           // 公历全称
+  week: string            // 星期
+  lunar: string           // 农历月日
+  gz: string              // 干支纪年（生肖）
+  yi: string[]            // 宜
+  ji: string[]            // 忌
+  distanceInfo: string    // 倒计时/距离信息
 }
 
 // ---------- 常量 ----------
-const weekStart = 1
+const weekStart = 1 // 设置周一为每周的第一天
 const now = new Date()
 
 // ---------- 响应式 ----------
+// 星期表头数据
 const weeks = ref<WeekHead[]>([])
+// 当前在看哪个月 (shallowRef 提升性能，因为 SolarMonth 对象较重)
 const currentSolarMonth = shallowRef(SolarMonth.fromYm(now.getFullYear(), now.getMonth() + 1))
+// 用户选中的那一天（默认是今天）
 const selectedSolarDay = shallowRef<SolarDay>(SolarDay.fromYmd(now.getFullYear(), now.getMonth() + 1, now.getDate()))
 
-// 弹窗状态
+// 日期选择器(Picker)的状态
 const showPicker = ref(false)
 const pickerMode = ref<'year' | 'month'>('month')
 const pickerSelection = reactive({ year: now.getFullYear(), month: now.getMonth() + 1 })
-const pickerBaseYear = ref(now.getFullYear())
+const pickerBaseYear = ref(now.getFullYear()) // 翻页年份列表的基准年
 
 // 标题
 const huangli = computed<HuangliInfo>(() => computeHuangli(selectedSolarDay.value))
 
-// 42 格数据
+// 核心：计算当前月份要在日历中显示的 42 颗格子（包含前后月的残余）
 const days42 = computed<DayCell[]>(() => {
   const arr: DayCell[] = []
+  // 获取该月在日历布局中包含的所有周（通常 5-6 周）
   const weeksList = currentSolarMonth.value.getWeeks(weekStart)
   
   weeksList.forEach(w =>
     w.getDays().forEach(d => {
+      // 将每个公历天对象包装成 UI 需要的 DayCell 对象
       arr.push(buildDayCell(d))
     })
   )
@@ -261,11 +268,11 @@ const pickerYears = computed(() => {
 })
 
 // ---------- 逻辑函数 ----------
-// 1. 样式逻辑
+// 样式判断逻辑：决定日期格子的背景、边框颜色
 function getCellClasses(d: DayCell): string[] {
   const cls: string[] = []
   
-  // 核心修改：默认背景透明，以便显示水印
+  // 选中状态样式：默认背景透明，以便显示水印
   if (selectedSolarDay.value.equals(d.solarDay)) {
     // 选中态：给一个带透明度的背景，或纯色背景
     cls.push('bg-blue-50/90 ring-2 ring-blue-500 z-10')
@@ -343,10 +350,12 @@ function confirmPicker() {
   selectedSolarDay.value = SolarDay.fromYmd(pickerSelection.year, pickerSelection.month, day)
   showPicker.value = false
 }
-
+// 选择器导航
 function prevMonth() {
+  // 向前推一个月并更新视图
   const m = currentSolarMonth.value.next(-1)
   currentSolarMonth.value = m
+  // 自动修正选中日（比如从3月31号跳到2月，防止2月没有31号）
   const day = Math.min(selectedSolarDay.value.getDay(), m.getDayCount())
   selectedSolarDay.value = SolarDay.fromYmd(m.getYear(), m.getMonth(), day)
 }
@@ -380,18 +389,18 @@ function buildWeekHeads(): WeekHead[] {
   }
   return heads
 }
-
+// 构建单格数据 (这是最复杂的转换逻辑)
 function buildDayCell(solarDay: SolarDay): DayCell {
-  const lunarDay = solarDay.getLunarDay()
-  const holiday  = solarDay.getLegalHoliday()
-  const weekIdx  = solarDay.getWeek().getIndex()
-  const term     = solarDay.getTerm()
-  const phaseDay = solarDay.getPhaseDay()
+  const lunarDay = solarDay.getLunarDay()// 获取农历
+  const holiday  = solarDay.getLegalHoliday()// 获取法定节假日
+  const weekIdx  = solarDay.getWeek().getIndex()// 获取周索引
+  const term     = solarDay.getTerm()// 获取节气
+  const phaseDay = solarDay.getPhaseDay()// 获取月相
 
   let isWeekend = weekIdx === 0 || weekIdx === 6
   if (holiday && holiday.isWork()) isWeekend = false
 
-  // 文字优先级
+  // 文字优先级显示逻辑：自定义节日 > 公历节日 > 农历节日 > 节气 > 农历初几
   let text = ''
   let isFestivalOrTerm = false
 
@@ -421,6 +430,7 @@ function buildDayCell(solarDay: SolarDay): DayCell {
       isFestivalOrTerm = true
     }
     else if (lunarDay.getDay() === 1) {
+      // 每月第一天显示月份名
       const lm = lunarDay.getLunarMonth()
       text = lm.getName()
       if (lm.getMonthWithLeap() === 1) text = lm.getLunarYear().getSixtyCycle().getName() + '年' + text
@@ -438,7 +448,7 @@ function buildDayCell(solarDay: SolarDay): DayCell {
     isWeekend,
     text,
     isFestivalOrTerm,
-    moon: phaseDay.getDayIndex() === 0,
+    moon: phaseDay.getDayIndex() === 0,// 判断是否为重要的月相转折点
     moonIndex: phaseDay.getPhase().getIndex()
   }
 }
