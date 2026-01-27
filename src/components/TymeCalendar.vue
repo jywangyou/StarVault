@@ -1,12 +1,12 @@
 <template>
-  <div class="w-full max-w-4xl mx-auto bg-white  shadow p-[clamp(10px,2.2vw,16px)] relative select-none min-h-[500px] flex flex-col">
+  <div class="w-full max-w-[694px] mx-auto bg-white dark:bg-zinc-900  shadow p-[clamp(10px,2.2vw,16px)] relative select-none min-h-[500px] flex flex-col transition-colors duration-300">
     
     <div class="flex items-center justify-between mb-[clamp(8px,1.8vw,12px)] relative z-10">
-      <button class="rounded-lg hover:bg-gray-100 text-gray-600 px-[clamp(8px,2vw,12px)] py-[clamp(4px,1vw,8px)] text-[clamp(11px,2.8vw,14px)] transition-colors" @click="prevMonth">上月</button>
+      <button class="rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-600 dark:text-gray-300 px-[clamp(8px,2vw,12px)] py-[clamp(4px,1vw,8px)] text-[clamp(11px,2.8vw,14px)] transition-colors" @click="prevMonth">上月</button>
       
       <div class="flex items-center gap-2">
         <button 
-          class="flex items-center gap-1 bg-white/80 backdrop-blur border border-gray-200 hover:border-blue-400 hover:text-blue-600 text-gray-700 px-3 py-1 rounded-lg transition-all text-[clamp(12px,3vw,16px)] font-semibold"
+          class="flex items-center gap-1 bg-white/80 dark:bg-zinc-800/80 backdrop-blur border border-gray-200 dark:border-zinc-700 hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 text-gray-700 dark:text-gray-200 px-3 py-1 rounded-lg transition-all text-[clamp(12px,3vw,16px)] font-semibold"
           @click="openPicker('year')"
         >
           <span>{{ currentSolarMonth.getYear() }}年</span>
@@ -14,7 +14,7 @@
         </button>
 
         <button 
-          class="flex items-center gap-1 bg-white/80 backdrop-blur border border-gray-200 hover:border-blue-400 hover:text-blue-600 text-gray-700 px-3 py-1 rounded-lg transition-all text-[clamp(12px,3vw,16px)] font-semibold"
+          class="flex items-center gap-1 bg-white/80 dark:bg-zinc-800/80 backdrop-blur border border-gray-200 dark:border-zinc-700 hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 text-gray-700 dark:text-gray-200 px-3 py-1 rounded-lg transition-all text-[clamp(12px,3vw,16px)] font-semibold"
           @click="openPicker('month')"
         >
           <span>{{ currentSolarMonth.getMonth() }}月</span>
@@ -23,9 +23,9 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <button class="rounded-lg hover:bg-gray-100 text-gray-600 px-[clamp(8px,2vw,12px)] py-[clamp(4px,1vw,8px)] text-[clamp(11px,2.8vw,14px)] transition-colors" @click="nextMonth">下月</button>
+        <button class="rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-600 dark:text-gray-300 px-[clamp(8px,2vw,12px)] py-[clamp(4px,1vw,8px)] text-[clamp(11px,2.8vw,14px)] transition-colors" @click="nextMonth">下月</button>
         <button 
-          class="rounded-lg bg-slate-900 hover:bg-slate-700 text-white px-[clamp(8px,2vw,12px)] py-[clamp(4px,1vw,8px)] text-[clamp(11px,2.8vw,14px)] transition-colors shadow-md flex items-center gap-1" 
+          class="rounded-lg bg-slate-900 hover:bg-slate-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 text-white px-[clamp(8px,2vw,12px)] py-[clamp(4px,1vw,8px)] text-[clamp(11px,2.8vw,14px)] transition-colors shadow-md flex items-center gap-1" 
           @click="goToday"
         >
           <span class="hidden sm:inline">返回今天</span>
@@ -35,24 +35,24 @@
     </div>
 
     <transition name="fade">
-      <div v-if="showPicker" class="absolute inset-0 z-20 bg-black/5 backdrop-blur-[1px] rounded-2xl" @click="showPicker = false"></div>
+      <div v-if="showPicker" class="absolute inset-0 z-20 bg-black/5 dark:bg-black/20 backdrop-blur-[1px] " @click="showPicker = false"></div>
     </transition>
 
     <transition name="slide-down">
-      <div v-if="showPicker" class="absolute top-[60px] left-4 right-4 z-30 bg-white/95 backdrop-blur-md rounded-xl shadow-xl border border-gray-100 p-4 flex flex-col max-h-[50%] overflow-hidden">
+      <div v-if="showPicker" class="absolute top-[60px] left-4 right-4 z-30 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md rounded-xl shadow-xl border border-gray-100 dark:border-zinc-800 p-4 flex flex-col max-h-[50%] overflow-hidden">
         
-        <div class="flex justify-center mb-4 border-b border-gray-100 pb-2">
-          <div class="flex gap-2 bg-gray-100/50 p-1 rounded-lg">
+        <div class="flex justify-center mb-4 border-b border-gray-100 dark:border-zinc-800 pb-2">
+          <div class="flex gap-2 bg-gray-100/50 dark:bg-zinc-800/50 p-1 rounded-lg">
             <button 
               class="px-4 py-1 rounded-md text-sm font-medium transition-all"
-              :class="pickerMode === 'year' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+              :class="pickerMode === 'year' ? 'bg-white dark:bg-zinc-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'"
               @click="pickerMode = 'year'"
             >
               年份
             </button>
             <button 
               class="px-4 py-1 rounded-md text-sm font-medium transition-all"
-              :class="pickerMode === 'month' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+              :class="pickerMode === 'month' ? 'bg-white dark:bg-zinc-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'"
               @click="pickerMode = 'month'"
             >
               月份
@@ -69,7 +69,7 @@
               v-for="y in pickerYears" 
               :key="y"
               class="py-2 rounded-lg text-sm transition-all border"
-              :class="y === pickerSelection.year ? 'bg-slate-900 text-white border-slate-900' : 'border-gray-50 bg-gray-50 text-gray-700 hover:border-blue-400'"
+              :class="y === pickerSelection.year ? 'bg-slate-900 text-white border-slate-900 dark:bg-zinc-100 dark:text-zinc-900 dark:border-zinc-100' : 'border-gray-50 bg-gray-50 text-gray-700 hover:border-blue-400 dark:bg-zinc-800 dark:border-zinc-700 dark:text-gray-300 dark:hover:border-blue-500'"
               @click="selectPickerYear(y)"
             >
               {{ y }}
@@ -84,7 +84,7 @@
               v-for="m in 12" 
               :key="m"
               class="py-3 rounded-lg text-sm font-medium transition-all border"
-              :class="m === pickerSelection.month ? 'bg-slate-900 text-white border-slate-900' : 'border-gray-50 bg-gray-50 text-gray-700 hover:border-blue-400'"
+              :class="m === pickerSelection.month ? 'bg-slate-900 text-white border-slate-900 dark:bg-zinc-100 dark:text-zinc-900 dark:border-zinc-100' : 'border-gray-50 bg-gray-50 text-gray-700 hover:border-blue-400 dark:bg-zinc-800 dark:border-zinc-700 dark:text-gray-300 dark:hover:border-blue-500'"
               @click="selectPickerMonth(m)"
             >
               {{ m }}月
@@ -95,8 +95,8 @@
     </transition>
 
     <div class="relative">
-      <div class="font-bold text-gray-100 select-none absolute -translate-x-2/4 -translate-y-2/4 left-2/4 top-2/4 whitespace-nowrap"
-           style="font-size: clamp(40px, 12vw, 160px);">
+      <div class="font-bold text-gray-100 dark:text-zinc-800/50 select-none absolute -translate-x-2/4 -translate-y-2/4 left-2/4 top-2/4 whitespace-nowrap"
+           style="font-size: clamp(40px, 12vw, 100px);">
         {{ currentSolarMonth.getYear() }}年{{ String(currentSolarMonth.getMonth()).padStart(2, '0') }}月
       </div>
     

@@ -109,30 +109,30 @@ function setTheme(t: Theme) {
     :class="[config.position === 'right' ? 'border-l' : 'border-r']"
   >
     <!-- Top: Avatar -->
-    <div class="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-all duration-300 cursor-pointer">
-      <User :size="20" />
+    <div class="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-all duration-300 cursor-pointer">
+      <User :size="18" />
     </div>
 
     <!-- Bottom: Settings -->
     <div class="relative">
       <button 
         @click="toggleSettings"
-        class="w-10 h-10 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 transition-all duration-300"
+        class="w-8 h-8 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 transition-all duration-300"
         :class="{ 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200': showSettings }"
       >
-        <Settings :size="20" />
+        <Settings :size="18" />
       </button>
 
       <!-- Settings Popover -->
       <div 
         v-if="showSettings"
-        class="absolute bottom-12 p-3 bg-white dark:bg-zinc-900 rounded-xl shadow-xl border border-zinc-200 dark:border-zinc-800 min-w-[200px] z-50 animate-in fade-in zoom-in-95 duration-200"
-        :class="[config.position === 'right' ? 'right-0' : 'left-0']"
+        class="absolute bottom-10 p-3 bg-white dark:bg-zinc-900 rounded-xl shadow-xl border border-zinc-200 dark:border-zinc-800 min-w-[200px] z-50 animate-in fade-in zoom-in-95 duration-200"
+        :class="[config.position === 'right' ? 'right-0 mr-12' : 'left-0 ml-12']"
       >
         <div class="space-y-4">
           <!-- Position Setting -->
           <div class="space-y-2">
-            <div class="text-xs font-medium text-zinc-400 uppercase tracking-wider">Sidebar Position</div>
+            <div class="text-xs font-medium text-zinc-400 uppercase tracking-wider">侧边栏位置</div>
             <div class="flex p-1 bg-zinc-100 dark:bg-zinc-800 rounded-lg">
               <button 
                 @click="setPosition('left')"
@@ -140,7 +140,7 @@ function setTheme(t: Theme) {
                 :class="config.position === 'left' ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-sm' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300'"
               >
                 <PanelLeft :size="14" class="mr-1.5" />
-                Left
+                左侧
               </button>
               <button 
                 @click="setPosition('right')"
@@ -148,14 +148,14 @@ function setTheme(t: Theme) {
                 :class="config.position === 'right' ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-sm' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300'"
               >
                 <PanelRight :size="14" class="mr-1.5" />
-                Right
+                右侧
               </button>
             </div>
           </div>
 
           <!-- Theme Setting -->
           <div class="space-y-2">
-            <div class="text-xs font-medium text-zinc-400 uppercase tracking-wider">Theme</div>
+            <div class="text-xs font-medium text-zinc-400 uppercase tracking-wider">主题模式</div>
             <div class="flex p-1 bg-zinc-100 dark:bg-zinc-800 rounded-lg">
               <button 
                 @click="setTheme('light')"
@@ -163,7 +163,7 @@ function setTheme(t: Theme) {
                 :class="config.theme === 'light' ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-sm' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300'"
               >
                 <Sun :size="14" class="mr-1.5" />
-                Light
+                明亮
               </button>
               <button 
                 @click="setTheme('dark')"
@@ -171,7 +171,7 @@ function setTheme(t: Theme) {
                 :class="config.theme === 'dark' ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-sm' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300'"
               >
                 <Moon :size="14" class="mr-1.5" />
-                Dark
+                暗黑
               </button>
             </div>
           </div>
