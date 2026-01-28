@@ -20,6 +20,10 @@ module.exports = {
           800: '#33388a',
           900: '#2a2f70',
         },
+        dark: {
+          bg: '#24273d',
+          accent: '#9580ff',
+        },
       },
       boxShadow: {
         card: '0 6px 24px rgba(0,0,0,0.08)',

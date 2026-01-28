@@ -8,7 +8,7 @@ const sidebarPosition = ref<'left' | 'right'>('right')
 
 <template>
   <div 
-    class="h-screen w-screen flex overflow-hidden bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300"
+    class="h-screen w-screen flex overflow-hidden bg-zinc-50 dark:bg-dark-bg transition-colors duration-300"
     :class="[sidebarPosition === 'right' ? 'flex-row-reverse' : 'flex-row']"
   >
     <!-- Sidebar -->

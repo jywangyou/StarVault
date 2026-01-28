@@ -1,1 +1,25 @@
 @import "tailwindcss";
+
+@theme {
+  /* Custom Dark Mode Colors */
+  --color-dark-bg: #24273d;
+  --color-dark-accent: #9580ff;
+
+  /* Brand Colors */
+  --color-brand-50: #f5f7ff;
+  --color-brand-100: #e9edff;
+  --color-brand-200: #d6dcff;
+  --color-brand-300: #b5bfff;
+  --color-brand-400: #8b98ff;
+  --color-brand-500: #646cff;
+  --color-brand-600: #5056dd;
+  --color-brand-700: #4045b0;
+  --color-brand-800: #33388a;
+  --color-brand-900: #2a2f70;
+  
+  /* Shadow */
+  --shadow-card: 0 6px 24px rgba(0,0,0,0.08);
+}
+
+/* Force dark mode to use class strategy */
+@variant dark (&:where(.dark, .dark *));

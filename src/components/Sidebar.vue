@@ -105,7 +105,7 @@ function setTheme(t: Theme) {
 
 <template>
   <div 
-    class="flex flex-col items-center justify-between w-[45px] py-4 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 transition-colors duration-300 shadow-sm h-full"
+    class="flex flex-col items-center justify-between w-[45px] py-4 bg-white dark:bg-dark-bg border-zinc-200 dark:border-zinc-800 transition-colors duration-300 shadow-sm h-full"
     :class="[config.position === 'right' ? 'border-l' : 'border-r']"
   >
     <!-- Top: Avatar -->
@@ -126,7 +126,7 @@ function setTheme(t: Theme) {
       <!-- Settings Popover -->
       <div 
         v-if="showSettings"
-        class="absolute bottom-10 p-3 bg-white dark:bg-zinc-900 rounded-xl shadow-xl border border-zinc-200 dark:border-zinc-800 min-w-[200px] z-50 animate-in fade-in zoom-in-95 duration-200"
+        class="absolute bottom-10 p-3 bg-white dark:bg-dark-bg rounded-xl shadow-xl border border-zinc-200 dark:border-zinc-700 min-w-[200px] z-50 animate-in fade-in zoom-in-95 duration-200"
         :class="[config.position === 'right' ? 'right-0 mr-12' : 'left-0 ml-12']"
       >
         <div class="space-y-4">
@@ -137,7 +137,7 @@ function setTheme(t: Theme) {
               <button 
                 @click="setPosition('left')"
                 class="flex-1 flex items-center justify-center py-1.5 rounded-md text-xs font-medium transition-all duration-300"
-                :class="config.position === 'left' ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-sm' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300'"
+                :class="config.position === 'left' ? 'bg-white dark:bg-dark-accent text-zinc-900 dark:text-white shadow-sm' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300'"
               >
                 <PanelLeft :size="14" class="mr-1.5" />
                 左侧
@@ -145,7 +145,7 @@ function setTheme(t: Theme) {
               <button 
                 @click="setPosition('right')"
                 class="flex-1 flex items-center justify-center py-1.5 rounded-md text-xs font-medium transition-all duration-300"
-                :class="config.position === 'right' ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-sm' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300'"
+                :class="config.position === 'right' ? 'bg-white dark:bg-dark-accent text-zinc-900 dark:text-white shadow-sm' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300'"
               >
                 <PanelRight :size="14" class="mr-1.5" />
                 右侧
@@ -160,7 +160,7 @@ function setTheme(t: Theme) {
               <button 
                 @click="setTheme('light')"
                 class="flex-1 flex items-center justify-center py-1.5 rounded-md text-xs font-medium transition-all duration-300"
-                :class="config.theme === 'light' ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-sm' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300'"
+                :class="config.theme === 'light' ? 'bg-white dark:bg-dark-accent text-zinc-900 dark:text-white shadow-sm' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300'"
               >
                 <Sun :size="14" class="mr-1.5" />
                 明亮
@@ -168,7 +168,7 @@ function setTheme(t: Theme) {
               <button 
                 @click="setTheme('dark')"
                 class="flex-1 flex items-center justify-center py-1.5 rounded-md text-xs font-medium transition-all duration-300"
-                :class="config.theme === 'dark' ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-sm' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300'"
+                :class="config.theme === 'dark' ? 'bg-white dark:bg-dark-accent text-zinc-900 dark:text-white shadow-sm' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300'"
               >
                 <Moon :size="14" class="mr-1.5" />
                 暗黑
