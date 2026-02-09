@@ -1,190 +1,206 @@
 <template>
-  <div class="w-full max-w-[694px] mx-auto bg-white dark:bg-dark-bg rounded-2xl shadow p-[clamp(10px,2.2vw,16px)] relative select-none min-h-[500px] flex flex-col transition-colors duration-300">
-    
-    <div class="flex items-center justify-between mb-[clamp(8px,1.8vw,12px)] relative z-10">
-      <button class="rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-600 dark:text-gray-300 px-[clamp(8px,2vw,12px)] py-[clamp(4px,1vw,8px)] text-[clamp(11px,2.8vw,14px)] transition-colors" @click="prevMonth">上月</button>
+  <div class="flex flex-col lg:flex-row gap-6 items-start justify-center max-w-7xl mx-auto">
+    <!-- Left: Calendar Card -->
+    <div class="w-full max-w-[694px] bg-white dark:bg-dark-bg  shadow p-[clamp(10px,2.2vw,16px)] relative select-none min-h-[500px] flex flex-col transition-colors duration-300 h-full">
       
-      <div class="flex items-center gap-2">
-        <button 
-          class="flex items-center gap-1 bg-white/80 dark:bg-zinc-800/80 backdrop-blur border border-gray-200 dark:border-zinc-700 hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 text-gray-700 dark:text-gray-200 px-3 py-1 rounded-lg transition-all text-[clamp(12px,3vw,16px)] font-semibold"
-          @click="openPicker('year')"
-        >
-          <span>{{ currentSolarMonth.getYear() }}年</span>
-          <i class="ri-arrow-down-s-line text-gray-400 text-xs"></i>
-        </button>
-
-        <button 
-          class="flex items-center gap-1 bg-white/80 dark:bg-zinc-800/80 backdrop-blur border border-gray-200 dark:border-zinc-700 hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 text-gray-700 dark:text-gray-200 px-3 py-1 rounded-lg transition-all text-[clamp(12px,3vw,16px)] font-semibold"
-          @click="openPicker('month')"
-        >
-          <span>{{ currentSolarMonth.getMonth() }}月</span>
-          <i class="ri-arrow-down-s-line text-gray-400 text-xs"></i>
-        </button>
-      </div>
-
-      <div class="flex items-center gap-2">
-        <button class="rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-600 dark:text-gray-300 px-[clamp(8px,2vw,12px)] py-[clamp(4px,1vw,8px)] text-[clamp(11px,2.8vw,14px)] transition-colors" @click="nextMonth">下月</button>
-        <button 
-          class="rounded-lg bg-slate-900 hover:bg-slate-700 dark:bg-dark-accent dark:hover:bg-brand-600 text-white px-[clamp(8px,2vw,12px)] py-[clamp(4px,1vw,8px)] text-[clamp(11px,2.8vw,14px)] transition-colors shadow-md flex items-center gap-1" 
-          @click="goToday"
-        >
-          <span class="hidden sm:inline">返回今天</span>
-          <span class="sm:hidden">今</span>
-        </button>
-      </div>
-    </div>
-
-    <transition name="fade">
-      <div v-if="showPicker" class="absolute inset-0 z-20 bg-black/5 dark:bg-black/20 backdrop-blur-[1px] rounded-2xl" @click="showPicker = false"></div>
-    </transition>
-
-    <transition name="slide-down">
-      <div v-if="showPicker" class="absolute top-[60px] left-4 right-4 z-30 bg-white/95 dark:bg-dark-bg/95 backdrop-blur-md rounded-xl shadow-xl border border-gray-100 dark:border-zinc-800 p-4 flex flex-col max-h-[50%] overflow-hidden">
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-[clamp(8px,1.8vw,12px)] relative z-20">
+        <button class="rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-600 dark:text-gray-300 px-[clamp(8px,2vw,12px)] py-[clamp(4px,1vw,8px)] text-[clamp(11px,2.8vw,14px)] transition-colors" @click="prevMonth">上月</button>
         
-        <div class="flex justify-center mb-4 border-b border-gray-100 dark:border-zinc-800 pb-2">
-          <div class="flex gap-2 bg-gray-100/50 dark:bg-zinc-800/50 p-1 rounded-lg">
-            <button 
-              class="px-4 py-1 rounded-md text-sm font-medium transition-all"
-              :class="pickerMode === 'year' ? 'bg-white dark:bg-dark-accent text-blue-600 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'"
-              @click="pickerMode = 'year'"
-            >
-              年份
-            </button>
-            <button 
-              class="px-4 py-1 rounded-md text-sm font-medium transition-all"
-              :class="pickerMode === 'month' ? 'bg-white dark:bg-dark-accent text-blue-600 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'"
-              @click="pickerMode = 'month'"
-            >
-              月份
-            </button>
-          </div>
-        </div>
-
-        <div class="flex-1 overflow-y-auto custom-scrollbar">
-          <div v-if="pickerMode === 'year'" class="grid grid-cols-4 gap-2">
-            <button class="col-span-4 text-xs text-gray-400 py-2 hover:text-blue-500" @click="changePickerYearRange(-12)">
-              <i class="ri-arrow-up-s-line"></i> 以前
-            </button>
-            <button 
-              v-for="y in pickerYears" 
-              :key="y"
-              class="py-2 rounded-lg text-sm transition-all border"
-              :class="y === pickerSelection.year ? 'bg-slate-900 text-white border-slate-900 dark:bg-dark-accent dark:text-white dark:border-dark-accent' : 'border-gray-50 bg-gray-50 text-gray-700 hover:border-blue-400 dark:bg-zinc-800 dark:border-zinc-700 dark:text-gray-300 dark:hover:border-blue-500'"
-              @click="selectPickerYear(y)"
-            >
-              {{ y }}
-            </button>
-            <button class="col-span-4 text-xs text-gray-400 py-2 hover:text-blue-500" @click="changePickerYearRange(12)">
-              <i class="ri-arrow-up-s-line"></i> 以前 <i class="ri-arrow-down-s-line"></i>
-            </button>
-          </div>
-
-          <div v-if="pickerMode === 'month'" class="grid grid-cols-3 gap-3">
-            <button 
-              v-for="m in 12" 
-              :key="m"
-              class="py-3 rounded-lg text-sm font-medium transition-all border"
-              :class="m === pickerSelection.month ? 'bg-slate-900 text-white border-slate-900 dark:bg-dark-accent dark:text-white dark:border-dark-accent' : 'border-gray-50 bg-gray-50 text-gray-700 hover:border-blue-400 dark:bg-zinc-800 dark:border-zinc-700 dark:text-gray-300 dark:hover:border-blue-500'"
-              @click="selectPickerMonth(m)"
-            >
-              {{ m }}月
-            </button>
-          </div>
-        </div>
-      </div>
-    </transition>
-
-    <div class="relative">
-      <div class="font-bold text-gray-100 dark:text-zinc-800/50 select-none absolute -translate-x-2/4 -translate-y-2/4 left-2/4 top-2/4 whitespace-nowrap"
-           style="font-size: clamp(40px, 12vw, 100px);">
-        {{ currentSolarMonth.getYear() }}年{{ String(currentSolarMonth.getMonth()).padStart(2, '0') }}月
-      </div>
-    
-
-    <div class="grid grid-cols-7 gap-[clamp(2px,0.8vw,6px)] mb-[clamp(6px,1.4vw,10px)] text-center text-gray-500 dark:text-gray-400 text-[clamp(10px,2.6vw,13px)] relative z-10">
-      <div v-for="w in weeks" :key="w.name" :class="{ 'text-red-500 dark:text-red-400': w.isWeekend }">
-        {{ w.name }}
-      </div>
-    </div>
-
-    <div class="grid grid-cols-7 gap-[clamp(2px,0.8vw,6px)] relative z-10">
-      <div
-        v-for="(d, i) in days42"
-        :key="i"
-        class="relative aspect-square rounded-lg border border-transparent p-[clamp(2px,0.8vw,6px)] flex flex-col justify-center cursor-pointer select-none transition-colors"
-        :class="getCellClasses(d)"
-        @click="selectDay(d)"
-      >
-        <div class="moonbox absolute top-[clamp(2px,0.7vw,6px)] left-[clamp(2px,0.7vw,6px)] 
-              w-[clamp(8px,3vw,18px)] h-[clamp(8px,3vw,18px)]
-              bg-contain bg-no-repeat opacity-80"
-        ></div>
-
-        <div class="text-center font-semibold leading-none pt-[clamp(2px,0.7vw,6px)] text-[clamp(12px,3.8vw,18px)]" 
-             :class="getSolarTextClass(d)">
-          {{ d.day }}
-        </div>
-
-        <div class="text-center truncate mt-[clamp(2px,0.6vw,6px)] px-[clamp(2px,0.6vw,6px)] text-[clamp(9px,2.2vw,12px)] font-medium" 
-             :class="getLunarTextClass(d)">
-          {{ d.text }}
-        </div>
-
-        <div class="absolute -top-[clamp(2px,0.6vw,5px)] -right-[clamp(2px,0.6vw,5px)] z-10">
-          <span
-            v-if="d.holiday && !d.holiday.isWork"
-            class="flex items-center justify-center w-[clamp(12px,3.2vw,18px)] h-[clamp(12px,3.2vw,18px)] rounded bg-red-500 text-white text-[clamp(8px,2vw,10px)] shadow-sm leading-none font-bold dark:bg-red-600/80"
+        <div class="flex items-center gap-2">
+          <button 
+            class="flex items-center gap-1 bg-white/80 dark:bg-zinc-800/80 backdrop-blur border border-gray-200 dark:border-zinc-700 hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 text-gray-700 dark:text-gray-200 px-3 py-1 rounded-lg transition-all text-[clamp(12px,3vw,16px)] font-semibold"
+            @click="openPicker('year')"
           >
-            休
-          </span>
-          <span
-            v-else-if="d.holiday && d.holiday.isWork"
-            class="flex items-center justify-center w-[clamp(12px,3.2vw,18px)] h-[clamp(12px,3.2vw,18px)] rounded bg-gray-600 text-white text-[clamp(8px,2vw,10px)] shadow-sm leading-none font-bold dark:bg-zinc-600"
+            <span>{{ currentSolarMonth.getYear() }}年</span>
+            <i class="ri-arrow-down-s-line text-gray-400 text-xs"></i>
+          </button>
+
+          <button 
+            class="flex items-center gap-1 bg-white/80 dark:bg-zinc-800/80 backdrop-blur border border-gray-200 dark:border-zinc-700 hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 text-gray-700 dark:text-gray-200 px-3 py-1 rounded-lg transition-all text-[clamp(12px,3vw,16px)] font-semibold"
+            @click="openPicker('month')"
           >
-            班
-          </span>
-          <span 
-            v-else-if="d.isToday" 
-            class="flex items-center justify-center w-[clamp(12px,3.2vw,18px)] h-[clamp(12px,3.2vw,18px)] rounded bg-blue-600 text-white text-[clamp(8px,2vw,10px)] shadow-sm leading-none font-bold dark:bg-blue-500"
+            <span>{{ currentSolarMonth.getMonth() }}月</span>
+            <i class="ri-arrow-down-s-line text-gray-400 text-xs"></i>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button class="rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-600 dark:text-gray-300 px-[clamp(8px,2vw,12px)] py-[clamp(4px,1vw,8px)] text-[clamp(11px,2.8vw,14px)] transition-colors" @click="nextMonth">下月</button>
+          <button 
+            class="rounded-lg bg-slate-900 hover:bg-slate-700 dark:bg-dark-accent dark:hover:bg-brand-600 text-white px-[clamp(8px,2vw,12px)] py-[clamp(4px,1vw,8px)] text-[clamp(11px,2.8vw,14px)] transition-colors shadow-md flex items-center gap-1" 
+            @click="goToday"
           >
-            今
-          </span>
+            <span class="hidden sm:inline">返回今天</span>
+            <span class="sm:hidden">今</span>
+          </button>
         </div>
       </div>
-    </div>
-    </div>
 
-    <div class="mt-[clamp(10px,2vw,16px)] rounded-xl bg-gray-50 dark:bg-zinc-800/50 p-[clamp(10px,2vw,14px)] relative z-10 border border-gray-100 dark:border-zinc-700/50">
-      <div class="text-gray-800 dark:text-gray-100 font-semibold text-[clamp(12px,3.2vw,16px)]">{{ huangli.solar }}</div>
-      <div class="mt-1 text-gray-600 dark:text-gray-400 text-[clamp(10px,2.6vw,13px)]">{{ huangli.lunar }} {{ huangli.gz }}</div>
+      <!-- Picker Overlay -->
+      <transition name="fade">
+        <div v-if="showPicker" class="absolute inset-0 z-30 bg-black/5 dark:bg-black/20 backdrop-blur-[1px] rounded-2xl" @click="showPicker = false"></div>
+      </transition>
 
-      <div class="mt-2 mb-2 text-indigo-600 dark:text-indigo-400 font-bold text-[clamp(11px,2.8vw,14px)]">
-         {{ huangli.distanceInfo }}
-      </div>
+      <!-- Picker Content -->
+      <transition name="slide-down">
+        <div v-if="showPicker" class="absolute top-[60px] left-4 right-4 z-40 bg-white/95 dark:bg-dark-bg/95 backdrop-blur-md rounded-xl shadow-xl border border-gray-100 dark:border-zinc-800 p-4 flex flex-col max-h-[50%] overflow-hidden">
+          
+          <div class="flex justify-center mb-4 border-b border-gray-100 dark:border-zinc-800 pb-2">
+            <div class="flex gap-2 bg-gray-100/50 dark:bg-zinc-800/50 p-1 rounded-lg">
+              <button 
+                class="px-4 py-1 rounded-md text-sm font-medium transition-all"
+                :class="pickerMode === 'year' ? 'bg-white dark:bg-dark-accent text-blue-600 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'"
+                @click="pickerMode = 'year'"
+              >
+                年份
+              </button>
+              <button 
+                class="px-4 py-1 rounded-md text-sm font-medium transition-all"
+                :class="pickerMode === 'month' ? 'bg-white dark:bg-dark-accent text-blue-600 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'"
+                @click="pickerMode = 'month'"
+              >
+                月份
+              </button>
+            </div>
+          </div>
 
-      <div class="mt-[clamp(8px,1.8vw,12px)] grid grid-cols-1 sm:grid-cols-2 gap-[clamp(8px,1.6vw,12px)] text-[clamp(10px,2.4vw,12px)]">
-        <div>
-          <div class="text-gray-500 dark:text-gray-400 mb-1">宜</div>
-          <div class="flex flex-wrap gap-1">
-            <span v-for="x in huangli.yi" :key="x" class="px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300">{{ x }}</span>
+          <div class="flex-1 overflow-y-auto custom-scrollbar">
+            <div v-if="pickerMode === 'year'" class="grid grid-cols-4 gap-2">
+              <button class="col-span-4 text-xs text-gray-400 py-2 hover:text-blue-500" @click="changePickerYearRange(-12)">
+                <i class="ri-arrow-up-s-line"></i> 以前
+              </button>
+              <button 
+                v-for="y in pickerYears" 
+                :key="y"
+                class="py-2 rounded-lg text-sm transition-all border"
+                :class="y === pickerSelection.year ? 'bg-slate-900 text-white border-slate-900 dark:bg-dark-accent dark:text-white dark:border-dark-accent' : 'border-gray-50 bg-gray-50 text-gray-700 hover:border-blue-400 dark:bg-zinc-800 dark:border-zinc-700 dark:text-gray-300 dark:hover:border-blue-500'"
+                @click="selectPickerYear(y)"
+              >
+                {{ y }}
+              </button>
+              <button class="col-span-4 text-xs text-gray-400 py-2 hover:text-blue-500" @click="changePickerYearRange(12)">
+                <i class="ri-arrow-down-s-line"></i> 以后
+              </button>
+            </div>
+
+            <div v-if="pickerMode === 'month'" class="grid grid-cols-3 gap-3">
+              <button 
+                v-for="m in 12" 
+                :key="m"
+                class="py-3 rounded-lg text-sm font-medium transition-all border"
+                :class="m === pickerSelection.month ? 'bg-slate-900 text-white border-slate-900 dark:bg-dark-accent dark:text-white dark:border-dark-accent' : 'border-gray-50 bg-gray-50 text-gray-700 hover:border-blue-400 dark:bg-zinc-800 dark:border-zinc-700 dark:text-gray-300 dark:hover:border-blue-500'"
+                @click="selectPickerMonth(m)"
+              >
+                {{ m }}月
+              </button>
+            </div>
           </div>
         </div>
-        <div>
-          <div class="text-gray-500 dark:text-gray-400 mb-1">忌</div>
-          <div class="flex flex-wrap gap-1">
-            <span v-for="x in huangli.ji" :key="x" class="px-2 py-0.5 rounded bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300">{{ x }}</span>
-          </div>
+      </transition>
+
+      <div class="relative">
+        <div class="font-bold text-gray-100 dark:text-zinc-800/50 select-none absolute -translate-x-2/4 -translate-y-2/4 left-2/4 top-2/4 whitespace-nowrap"
+             style="font-size: clamp(40px, 12vw, 100px);">
+          {{ currentSolarMonth.getYear() }}年{{ String(currentSolarMonth.getMonth()).padStart(2, '0') }}月
         </div>
-      </div>
       
+
+      <div class="grid grid-cols-7 gap-[clamp(2px,0.8vw,6px)] mb-[clamp(6px,1.4vw,10px)] text-center text-gray-500 dark:text-gray-400 text-[clamp(10px,2.6vw,13px)] relative z-10">
+        <div v-for="w in weeks" :key="w.name" :class="{ 'text-red-500 dark:text-red-400': w.isWeekend }">
+          {{ w.name }}
+        </div>
       </div>
+
+      <div class="grid grid-cols-7 gap-[clamp(2px,0.8vw,6px)] relative z-10">
+        <div
+          v-for="(d, i) in days42"
+          :key="i"
+          class="relative aspect-square rounded-lg border border-transparent p-[clamp(2px,0.8vw,6px)] flex flex-col justify-center cursor-pointer select-none transition-colors"
+          :class="getCellClasses(d)"
+          @click="selectDay(d)"
+        >
+          <div class="moonbox absolute top-[clamp(2px,0.7vw,6px)] left-[clamp(2px,0.7vw,6px)] 
+                w-[clamp(8px,3vw,18px)] h-[clamp(8px,3vw,18px)]
+                bg-contain bg-no-repeat opacity-80"
+          ></div>
+
+          <div class="text-center font-semibold leading-none pt-[clamp(2px,0.7vw,6px)] text-[clamp(12px,3.8vw,18px)] whitespace-nowrap" 
+               :class="getSolarTextClass(d)">
+            {{ d.day }}
+          </div>
+
+          <div class="text-center truncate mt-[clamp(2px,0.6vw,6px)] px-[clamp(2px,0.6vw,6px)] text-[clamp(9px,2.2vw,12px)] font-medium whitespace-nowrap" 
+               :class="getLunarTextClass(d)">
+            {{ d.text }}
+          </div>
+
+          <div class="absolute -top-[clamp(2px,0.6vw,5px)] -right-[clamp(2px,0.6vw,5px)] z-10">
+            <span
+              v-if="d.holiday && !d.holiday.isWork"
+              class="flex items-center justify-center w-[clamp(12px,3.2vw,18px)] h-[clamp(12px,3.2vw,18px)] rounded bg-red-500 text-white text-[clamp(8px,2vw,10px)] shadow-sm leading-none font-bold dark:bg-red-600/80"
+            >
+              休
+            </span>
+            <span
+              v-else-if="d.holiday && d.holiday.isWork"
+              class="flex items-center justify-center w-[clamp(12px,3.2vw,18px)] h-[clamp(12px,3.2vw,18px)] rounded bg-gray-600 text-white text-[clamp(8px,2vw,10px)] shadow-sm leading-none font-bold dark:bg-zinc-600"
+            >
+              班
+            </span>
+            <span 
+              v-else-if="d.isToday" 
+              class="flex items-center justify-center w-[clamp(12px,3.2vw,18px)] h-[clamp(12px,3.2vw,18px)] rounded bg-blue-600 text-white text-[clamp(8px,2vw,10px)] shadow-sm leading-none font-bold dark:bg-blue-500"
+            >
+              今
+            </span>
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <div class="mt-[clamp(10px,2vw,16px)] rounded-xl bg-gray-50 dark:bg-zinc-800/50 p-[clamp(10px,2vw,14px)] relative z-10 border border-gray-100 dark:border-zinc-700/50">
+        <div class="text-gray-800 dark:text-gray-100 font-semibold text-[clamp(12px,3.2vw,16px)]">{{ huangli.solar }}</div>
+        <div class="mt-1 text-gray-600 dark:text-gray-400 text-[clamp(10px,2.6vw,13px)]">{{ huangli.lunar }} {{ huangli.gz }}</div>
+
+        <div class="mt-2 mb-2 text-indigo-600 dark:text-indigo-400 font-bold text-[clamp(11px,2.8vw,14px)]">
+           {{ huangli.distanceInfo }}
+        </div>
+
+        <div class="mt-[clamp(8px,1.8vw,12px)] grid grid-cols-1 sm:grid-cols-2 gap-[clamp(8px,1.6vw,12px)] text-[clamp(10px,2.4vw,12px)]">
+          <div>
+            <div class="text-gray-500 dark:text-gray-400 mb-1">宜</div>
+            <div class="flex flex-wrap gap-1">
+              <span v-for="x in huangli.yi" :key="x" class="px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300">{{ x }}</span>
+            </div>
+          </div>
+          <div>
+            <div class="text-gray-500 dark:text-gray-400 mb-1">忌</div>
+            <div class="flex flex-wrap gap-1">
+              <span v-for="x in huangli.ji" :key="x" class="px-2 py-0.5 rounded bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300">{{ x }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Task List (Below Huangli) -->
+      <div class="lg:hidden mt-4 pt-4 border-t border-gray-100 dark:border-zinc-800">
+        <TaskList :selected-date="selectedDateJs" />
+      </div>
+    </div>
+
+    <!-- Desktop Task List (Right Side) -->
+    <div class="hidden lg:block w-80 shrink-0 sticky top-4">
+      <TaskList :selected-date="selectedDateJs" />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, shallowRef, computed, onMounted, reactive } from 'vue'
-// Week: 星期, SolarMonth: 公历月, SolarDay: 公历日
 import { Week, SolarMonth, SolarDay } from 'tyme4ts'
+import TaskList from './TaskList.vue'
+
 
 // ---------- 自定义节日配置 ----------
 // 格式: '公历月-公历日': '节日名称'
@@ -220,6 +236,10 @@ interface HuangliInfo {
   distanceInfo: string    // 倒计时/距离信息
 }
 
+const emit = defineEmits<{
+  (e: 'update:selectedDate', date: Date): void
+}>()
+
 // ---------- 常量 ----------
 const weekStart = 1 // 设置周一为每周的第一天
 const now = new Date()
@@ -231,6 +251,11 @@ const weeks = ref<WeekHead[]>([])
 const currentSolarMonth = shallowRef(SolarMonth.fromYm(now.getFullYear(), now.getMonth() + 1))
 // 用户选中的那一天（默认是今天）
 const selectedSolarDay = shallowRef<SolarDay>(SolarDay.fromYmd(now.getFullYear(), now.getMonth() + 1, now.getDate()))
+
+const selectedDateJs = computed(() => {
+  const d = selectedSolarDay.value
+  return new Date(d.getYear(), d.getMonth() - 1, d.getDay())
+})
 
 // 日期选择器(Picker)的状态
 const showPicker = ref(false)
@@ -368,15 +393,35 @@ function nextMonth() {
 
 function goToday() {
   const n = new Date()
-  currentSolarMonth.value = SolarMonth.fromYm(n.getFullYear(), n.getMonth() + 1)
-  selectedSolarDay.value = SolarDay.fromYmd(n.getFullYear(), n.getMonth() + 1, n.getDate())
+  const y = n.getFullYear()
+  const m = n.getMonth() + 1
+  const d = n.getDate()
+  currentSolarMonth.value = SolarMonth.fromYm(y, m)
+  selectedSolarDay.value = SolarDay.fromYmd(y, m, d)
+  
+  // Update picker selection
+  pickerSelection.year = y
+  pickerSelection.month = m
+  
+  emit('update:selectedDate', n)
 }
 
-function selectDay(d: DayCell) {
-  if (!d.isCurrentMonth) {
-    currentSolarMonth.value = d.solarDay.getSolarMonth()
+function selectDay(cell: DayCell) {
+  selectedSolarDay.value = cell.solarDay
+  
+  // If not current month, switch month
+  if (!cell.isCurrentMonth) {
+    const y = cell.solarDay.getYear()
+    const m = cell.solarDay.getMonth()
+    currentSolarMonth.value = SolarMonth.fromYm(y, m)
+    
+    // Update picker selection
+    pickerSelection.year = y
+    pickerSelection.month = m
   }
-  selectedSolarDay.value = d.solarDay
+  
+  const d = cell.solarDay
+  emit('update:selectedDate', new Date(d.getYear(), d.getMonth() - 1, d.getDay()))
 }
 
 // 3. 数据构造逻辑
@@ -462,10 +507,8 @@ function computeHuangli(solarDay: SolarDay): HuangliInfo {
   const yi = lunarDay.getRecommends().map((x: any) => x.toString())
   const ji = lunarDay.getAvoids().map((x: any) => x.toString())
 
-  // ----- 距离计算逻辑 -----
-  // 1. 获取目标名称
-  let targetName = lunarDay.getName()
   // 检查自定义节日
+  let targetName = ''
   const customKey = `${solarDay.getMonth()}-${solarDay.getDay()}`
   if (customFestivals[customKey]) {
     targetName = customFestivals[customKey]
@@ -501,7 +544,6 @@ function computeHuangli(solarDay: SolarDay): HuangliInfo {
     distanceInfo = `距离${targetName}已过${Math.abs(diffDays)}天`
   }
 
-  // 已移除其他详细数据的计算，只保留要求的字段
   return {
     solar: `${solarDay.toString()} 星期${solarDay.getWeek().getName()}`,
     week: solarDay.getWeek().toString(),
@@ -516,6 +558,8 @@ function computeHuangli(solarDay: SolarDay): HuangliInfo {
 // ---------- 挂载 ----------
 onMounted(() => {
   weeks.value = buildWeekHeads()
+  const d = selectedSolarDay.value
+  emit('update:selectedDate', new Date(d.getYear(), d.getMonth() - 1, d.getDay()))
 })
 </script>
 
@@ -578,6 +622,6 @@ onMounted(() => {
   background-image: url('data:image/svg+xml,<svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="200" height="200"><ellipse style="stroke: rgb(0, 0, 0); fill: rgb(245, 186, 69);" cx="511.394" cy="512.303" rx="383.796" ry="382.991"/><path d="M 127.829 511.829 C 127.829 459.947 138.069 410.112 158.207 362.667 C 178.346 315.221 205.994 274.603 240.127 240.128 C 274.261 205.653 315.221 178.347 362.666 158.208 C 410.111 138.069 459.605 127.829 511.829 127.829 C 564.053 127.829 613.546 138.069 660.991 158.208 C 708.437 178.347 749.397 205.995 783.871 240.128 C 818.346 274.261 845.653 315.221 865.791 362.667 C 885.93 410.112 896.17 459.605 896.17 511.829 C 896.17 564.053 885.93 613.547 865.791 660.992 C 845.653 708.437 818.005 749.397 783.871 783.872 C 749.738 818.347 708.778 845.653 660.991 865.792 C 613.205 885.931 563.711 896.171 511.829 896.171 C 459.946 896.171 410.111 885.931 362.666 865.792 C 315.221 845.653 274.602 818.005 240.127 783.872 C 205.653 749.739 178.346 708.779 158.207 660.992 C 138.069 613.205 127.829 564.053 127.829 511.829 Z M 168.789 511.829 C 168.789 558.592 178.005 602.965 196.095 645.291 C 214.186 687.616 238.762 724.139 269.482 754.859 C 300.202 785.579 336.725 809.813 379.05 828.245 C 421.375 846.677 465.749 855.552 512.17 855.552 L 519.338 855.552 L 519.338 168.789 L 512.17 168.789 C 465.749 168.789 421.375 178.005 379.05 196.096 C 336.725 214.187 300.202 238.763 269.482 269.483 C 238.762 300.203 214.527 336.725 196.095 379.051 C 177.663 421.376 168.789 465.749 168.789 511.829 Z" style="fill: rgb(100, 108, 119);"/></svg>');
 }
 .moon-7  .moonbox {
-  background-image: url('data:image/svg+xml,<svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="200" height="200"><ellipse style="stroke: rgb(0, 0, 0); fill: rgb(245, 186, 69);" cx="511.394" cy="512.303" rx="383.796" ry="382.991"/><path d="M 127.829 511.829 C 127.829 459.947 138.069 410.112 158.207 362.667 C 178.346 315.221 205.994 274.603 240.127 240.128 C 274.261 205.653 315.221 178.347 362.666 158.208 C 410.111 138.069 459.605 127.829 511.829 127.829 C 564.053 127.829 613.546 138.069 660.991 158.208 C 708.437 178.347 749.397 205.995 783.871 240.128 C 818.346 274.261 845.653 315.221 865.791 362.667 C 885.93 410.112 896.17 459.605 896.17 511.829 C 896.17 564.053 885.93 613.547 865.791 660.992 C 845.653 708.437 818.005 749.397 783.871 783.872 C 749.738 818.347 708.778 845.653 660.991 865.792 C 613.205 885.931 563.711 896.171 511.829 896.171 C 459.946 896.171 410.111 885.931 362.666 865.792 C 315.221 845.653 274.602 818.005 240.127 783.872 C 205.653 749.739 178.346 708.779 158.207 660.992 C 138.069 613.205 127.829 564.053 127.829 511.829 Z M 168.789 511.829 C 168.789 596.48 196.095 670.891 251.05 734.72 C 306.005 798.549 374.613 837.461 456.874 851.115 C 422.399 834.048 393.386 813.568 369.493 788.992 C 345.599 764.416 326.826 737.792 313.855 708.096 C 300.885 678.4 291.327 647.68 285.525 615.936 C 279.722 584.192 276.65 549.376 276.65 511.488 C 276.65 439.467 293.717 372.907 327.509 312.149 C 361.301 251.392 408.405 204.288 468.138 171.52 C 412.501 178.688 361.983 197.803 316.245 229.547 C 270.506 261.291 234.666 302.251 208.383 352.085 C 182.101 401.92 168.789 454.827 168.789 511.829 Z" style="fill: rgb(100, 108, 119);"/></svg>');
+  background-image: url('data:image/svg+xml,<svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="200" height="200"><ellipse style="stroke: rgb(0, 0, 0); fill: rgb(245, 186, 69);" cx="511.394" cy="512.303" rx="383.796" ry="382.991"/><path d="M 127.829 511.829 C 127.829 459.947 138.069 410.112 158.207 362.667 C 178.346 315.221 205.994 274.603 240.127 240.128 C 274.261 205.653 315.221 178.347 362.666 158.208 C 410.111 138.069 459.605 127.829 511.829 127.829 C 564.053 127.829 613.546 138.069 660.991 158.208 C 708.437 178.347 749.397 205.995 783.871 240.128 C 818.346 274.261 845.653 315.221 865.791 362.667 C 885.93 410.112 896.17 459.605 896.17 511.829 C 896.17 564.053 885.93 613.547 865.791 660.992 C 845.653 708.437 818.005 749.397 783.871 783.872 C 749.738 818.347 708.778 845.653 660.991 865.792 C 613.205 885.931 563.711 896.171 511.829 896.171 C 459.946 896.171 410.111 885.931 362.666 865.792 C 315.221 845.653 274.602 818.005 240.127 783.872 C 205.653 749.739 178.346 708.779 158.207 660.992 C 138.069 613.205 127.829 511.829 Z M 168.789 511.829 C 168.789 596.48 196.095 670.891 251.05 734.72 C 306.005 798.549 374.613 837.461 456.874 851.115 C 422.399 834.048 393.386 813.568 369.493 788.992 C 345.599 764.416 326.826 737.792 313.855 708.096 C 300.885 678.4 291.327 647.68 285.525 615.936 C 279.722 584.192 276.65 549.376 276.65 511.488 C 276.65 439.467 293.717 372.907 327.509 312.149 C 361.301 251.392 408.405 204.288 468.138 171.52 C 412.501 178.688 361.983 197.803 316.245 229.547 C 270.506 261.291 234.666 302.251 208.383 352.085 C 182.101 401.92 168.789 454.827 168.789 511.829 Z" style="fill: rgb(100, 108, 119);"/></svg>');
 }
 </style>

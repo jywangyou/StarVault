@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
-import { Settings, User, Moon, Sun, PanelLeft, PanelRight } from 'lucide-vue-next'
+import { Settings, User, Moon, Sun, PanelLeft, PanelRight, Star } from 'lucide-vue-next'
 
 // Types
 type Position = 'left' | 'right'
@@ -14,6 +14,7 @@ interface Config {
 const emit = defineEmits<{
   (e: 'update:position', position: Position): void
   (e: 'update:theme', theme: Theme): void
+  (e: 'open:reminder'): void
 }>()
 
 // State
@@ -108,9 +109,30 @@ function setTheme(t: Theme) {
     class="flex flex-col items-center justify-between w-[45px] py-4 bg-white dark:bg-dark-bg border-zinc-200 dark:border-zinc-800 transition-colors duration-300 shadow-sm h-full"
     :class="[config.position === 'right' ? 'border-l' : 'border-r']"
   >
-    <!-- Top: Avatar -->
-    <div class="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-all duration-300 cursor-pointer">
-      <User :size="18" />
+    <div class="flex flex-col items-center gap-4">
+      <!-- Top: Avatar -->
+      <div class="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-all duration-300 cursor-pointer">
+        <User :size="18" />
+      </div>
+
+      <!-- Reminder (Star) -->
+      <div class="relative group flex flex-col items-center">
+        <button 
+          @click="$emit('open:reminder')"
+          class="w-10 h-10 rounded-xl flex items-center justify-center text-zinc-400 hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-400/10 transition-all duration-300"
+        >
+          <Star :size="20" />
+        </button>
+        <span class="text-[10px] font-medium text-zinc-500 dark:text-zinc-500 mt-0.5 scale-90">提醒</span>
+        
+        <!-- Tooltip -->
+        <div 
+          class="absolute top-1/2 -translate-y-1/2 px-2 py-1 bg-zinc-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50"
+          :class="[config.position === 'left' ? 'left-full ml-2' : 'right-full mr-2']"
+        >
+          代办星
+        </div>
+      </div>
     </div>
 
     <!-- Bottom: Settings -->
